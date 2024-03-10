@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Comment{% endblock title %}
+
+{% block content %}
+    <h1>Comment</h1>
+    <form action="{% url 'comment' pk=post.pk %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="content"></label>
+            <textarea class="form-control" id="content" name="content" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}

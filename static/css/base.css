@@ -1,0 +1,175 @@
+/* Reset some default styles for better cross-browser consistency */
+body, h1, h2, p, ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom styles for the navbar */
+body {
+  padding-top: 56px; /* Adjust body padding to match the height of the fixed navbar */
+  background-color: #0f0f2f; /* Dark blue background */
+  color: #ffffff; /* Light text for contrast */
+}
+.my-heading {
+  color: #c06c84; /* Lighter purple for heading text */
+  font-size: 2.5rem; /* Increase font size for heading */
+  margin-bottom: 10px; /* Add some space below the heading */
+}
+
+.my-paragraph {
+  color: #c06c84; /* Lighter purple for paragraph text */
+  font-size: 1.2rem; /* Increase font size for paragraph */
+  margin-bottom: 20px; /* Add some space below the paragraph */
+}
+
+
+.navbar-custom {
+  background-color: #4b3f72; /* Dark purple background for navbar */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .navbar-nav .nav-link {
+  color: #ffffff; /* White text for visibility */
+}
+
+.navbar-custom .navbar-toggler-icon {
+  background-color: #f5f5f7; /* Set the hamburger icon color to white */
+}
+
+.navbar-custom .navbar-toggler {
+  border-color: #3a4ca4; /* Set the border color of the hamburger button */
+}
+
+/* Set a global font family */
+body {
+  font-family: 'Arial', sans-serif;
+}
+
+/* Style the header */
+header {
+  background-color: #3b5998; /* Change the background color to Facebook blue */
+  color: #3d51aa; /* Set text color to white */
+  padding: 20px;
+  text-align: center;
+}
+
+/* Style the main content container */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #26254c; /* Darker shade for the container background */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Flex container for posts */
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.flex-container > div {
+  background-color: #302e63; /* Slightly lighter shade for the card background */
+  margin: 10px;
+  text-align: center;
+  line-height: 75px;
+  font-size: 30px;
+}
+
+.flex-container > div > a {
+  color: #c06c84; /* Lighter purple for links to stand out */
+  text-decoration: none;
+}
+
+/* Style links */
+a {
+  color: #c06c84; /* Lighter purple for links to stand out */
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.smaller-image {
+  width: 40px; /* Adjust the width as needed */
+  height: 40px; /* Adjust the height as needed */
+  border-radius: 50%; /* Circular image */
+  object-fit: cover; /* Ensure the image covers the area without stretching */
+  border: 2px solid #fff; /* White border around the image */
+}
+
+
+/* Style buttons */
+.button, .btn-primary, .btn-danger, .like-btn, .follow-btn {
+  background-color: #6c5b7b; /* A purple shade taken from the icon for buttons */
+  color: #fff; /* Set text color to white */
+  text-decoration: none;
+  border-radius: 5px;
+  padding: 5px 10px; /* Adjust button padding */
+  border: none; /* Remove border */
+}
+
+.button:hover, .btn-primary:hover, .btn-danger:hover, .like-btn:hover, .follow-btn:hover {
+  background-color: #c06c84; /* A complementary lighter purple for hover state */
+}
+
+/* Add some styles to improve the overall look of the posts */
+.card {
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+/* Style the edit and delete buttons */
+.btn-group {
+  margin-top: 10px;
+}
+
+/* Add some spacing to the page */
+.mt-4 {
+  margin-top: 20px !important;
+}
+
+
+/* footer */
+
+/* * Responsive styles */ 
+
+/* Small devices (landscape phones, less than 576px) */
+@media (max-width: 575.98px) { 
+  body {
+    padding-top: 48px; /* Adjust body padding for smaller navbar */
+  }
+
+  .container {
+    max-width: 100%; /* Allow container to use full width */
+    padding: 10px; /* Reduce padding */
+  }
+}
+
+/* Medium devices (tablets, less than 768px) */
+@media (max-width: 767.98px) { 
+  .container {
+    max-width: 100%; /* Allow container to use full width */
+    padding: 15px; /* Reduce padding */
+  }
+}
+
+/* Large devices (desktops, less than 992px) */
+@media (max-width: 991.98px) { 
+  .container {
+    max-width: 95%; /* Allow container to use almost full width */
+  }
+}
+
+/* Extra large devices (large desktops, less than 1200px) */
+@media (max-width: 1199.98px) { 
+  .container {
+    max-width: 90%; /* Allow container to use almost full width */
+  }
+}

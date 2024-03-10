@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit{% endblock title %}
+
+{% block content %}
+    <h1>Edit {{ post.title }}</h1>
+    <p class="card-text">{{ post.body|truncatechars:100 }}</p>
+    <small class="text-muted">Published on {{ post.created_on|date:"F d, Y" }}</small>
+    
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save changes</button>
+    </form>
+{% endblock content %}

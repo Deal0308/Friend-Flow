@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <style>
+        .reply-form-container {
+            margin-top: 10px;
+        }
+        .reply-form {
+            display: flex;
+            flex-direction: column;
+        }
+        .message-text {
+            margin-bottom: 10px;
+        }
+    </style>
+{% endblock %}
+{% block title %}Conversation List{% endblock %}
+
+{% block content %}
+<h1>Conversation List</h1>
+{% if object_list %}
+    {% for conversation in object_list %}
+        <div class="card" id="conversation_{{ conversation.id }}">
+            <div class="card-body">
+                <a href="{% url 'conversation_detail' conversation.id %}">
+                    <h5 class="card-title">
+                        {% with conversation.messages.last as last_msg %}
+                            {% if last_msg %}
+                                {% if last_msg.content|length > 50 %}
+                                    {{ last_msg.content|truncatechars:50 }}
+                                {% else %}
+                                    {{ last_msg.content }}
+                                {% endif %}
+                            {% else %}
+                                No messages yet.
+                            {% endif %}
+                        {% endwith %}
+                    </h5>
+                    <p class="card-text">
+                        <strong>From</strong>
+                        {% for participant in conversation.members.all %}
+                            {% if participant != request.user %}
+                                {{ participant.username }},
+                            {% endif %}
+                        {% endfor %}
+                        <br>
+                        <strong>Last Updated:</strong> {{ conversation.last_updated|date:"D, d M Y H:i" }}
+                    </p>
+                </a>
+                <button class="btn btn-secondary toggle-reply-form" data-conversation-id="{{ conversation.id }}">Quick Reply</button>
+                <button class="btn btn-danger delete-button" data-conversation-id="{{ conversation.id }}" data-delete-url="{% url 'delete_conversation' conversation.id %}">Delete</button>
+                
+                <!-- Hidden Reply Form Initially -->
+                <div class="reply-form-container" style="display: none;" id="reply-form-{{ conversation.id }}">
+                    <form class="reply-form" data-conversation-id="{{ conversation.id }}" action="{% url 'reply_to_conversation' conversation.id %}">
+                        {% csrf_token %}
+                        <textarea name="content" class="message-text" placeholder="Type your reply here..."></textarea>
+                        <button type="submit" class="btn btn-primary">Send Reply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No conversations found.</p>
+{% endif %}
+<a href="{% url 'compose_message' %}" class="btn btn-primary">Start a new conversation</a>
+<script>
+    function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+    $(document).ready(function() {
+        // Function to get CSRF token
+        function getCsrfToken() {
+            return $('[name="csrfmiddlewaretoken"]').val();
+        }
+    
+        // Setup AJAX to include CSRF token
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                }
+            }
+        });
+    
+        // Delete conversation with confirmation
+        $(".delete-button").click(function() {
+            if (confirm("Are you sure you want to delete this conversation?")) {
+                const conversationId = $(this).data("conversation-id");
+                $.ajax({
+                    type: "DELETE",
+                    url: $(this).data("delete-url"),
+                    success: function(data) {
+                        console.log("Conversation deleted: ", data);
+                        $(`#conversation_${conversationId}`).remove(); // Remove the conversation card
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error deleting conversation: ", error);
+                    }
+                });
+            }
+        });
+    
+        // Toggle reply form display
+        $(".toggle-reply-form").click(function() {
+            var conversationId = $(this).data("conversation-id");
+            $("#reply-form-" + conversationId).toggle(); // Toggle visibility
+        });
+    
+        // AJAX submission for the reply form
+        $(".reply-form").submit(function(event) {
+        event.preventDefault(); // Prevent default form submission
+        var form = $(this); // Fixed: Correctly reference the form in the current scope
+        var conversationId = form.data("conversation-id");
+        var messageText = form.find("[name='content']").val(); // Assuming the textarea/input name is 'content'
+
+        $.ajax({
+            type: "POST",
+            url: `/accounts/home/conversations/${conversationId}/reply/`, // Adjust URL as needed
+            data: JSON.stringify({ 'content': messageText }), // Ensure data structure matches the expected format
+            headers: {
+                "X-CSRFToken": getCsrfToken(), // Assume getCsrfToken() is a function that retrieves the CSRF token
+                "Content-Type": "application/json"
+            },
+            dataType: "json",
+            success: function(response) {
+                // Handle success, for example, clear the form or display a success message
+                console.log("Reply sent successfully:", response);
+                form.find("[name='content']").val(''); // Clear the message input/textarea after successful send
+            },
+            error: function(xhr, status, error) {
+                // Handle error, for example, display an error message
+                console.error("Error replying to conversation:", xhr.responseText);
+            }
+        });
+    });
+});
+
+// Function to retrieve CSRF token value
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+    </script>
+
+            {% endblock %}

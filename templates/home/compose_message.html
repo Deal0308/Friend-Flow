@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversation List{% endblock title %}
+
+{% block content %}
+    <h1>Conversation</h1>
+    
+    <!-- Add the compose message form here -->
+    <form method="post" action="{% url 'compose_message' %}">
+        {% csrf_token %}
+        <label for="recipient">Recipient:</label>
+        <select id="recipient" name="recipient" required>
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        
+        <label for="message">Message:</label>
+        <textarea name="message" rows="4" cols="50"></textarea>
+        <br>
+        <button type="submit">Send</button>
+    </form>
+
+    
+    <script>
+        $(document).ready(function() {
+            $("#composeMessageForm").submit(function(event) {
+                event.preventDefault(); // Prevent the form from submitting via the browser.
+    
+                var formData = {
+                    'recipient': $('input[name=recipient]').val(), // Adjust based on your form
+                    'message': $('textarea[name=message]').val(), // Adjust based on your form
+                };
+    
+                $.ajax({
+                    type: "POST",
+                    url: "/path/to/compose/message/",
+                    data: JSON.stringify(formData),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    beforeSend: function(xhr, settings) {
+                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        }
+                    },
+                    success: function(data) {
+                        console.log("Message sent: ", data);
+                        // Redirect to the conversation detail page for the newly created or updated conversation
+                        if(data.conversation_id) {
+                            window.location.href = `/path/to/conversation/${data.conversation_id}/`;
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error sending message: ", xhr.responseText);
+                        // Handle error
+                    }
+                });
+            });
+        });
+    </script>
+    
+        
+    
+    <!-- Display the conversation list here -->
+    {% for conversation in conversations %}
+    <li>
+        <strong>Participants:</strong>
+        {% for participant in conversation.members.all %}
+            {{ participant.username }},
+        {% endfor %}<br>
+        <strong>Last Updated:</strong> {{ conversation.last_updated }}
+        <!-- Hypothetical Reply Link (would require JS to properly implement) -->
+        <button type="button" onclick="setupReplyForm('{{ conversation.id }}')">Reply</button>
+    
+    </li>
+{% endfor %}
+    
+{% endblock content %}

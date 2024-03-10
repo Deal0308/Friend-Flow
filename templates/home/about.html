@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}About{% endblock title %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <h1 class="mb-4">About Us</h1>
+                <p class="lead">Welcome to our website! We are a team of passionate individuals dedicated to creating innovative solutions for our users.</p>
+                <p>We believe in leveraging technology to make people's lives easier and more enjoyable. Our goal is to provide high-quality services and products that exceed our customers' expectations.</p>
+                <p>At our core, we value creativity, collaboration, and customer satisfaction. We are constantly striving to improve and evolve, staying ahead of the curve in an ever-changing digital landscape.</p>
+                <p>Thank you for visiting our website. We hope you find it informative and engaging. If you have any questions or feedback, please don't hesitate to contact us.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-image-container">
+                    <!-- make the image circular -->
+                    <img src="{% static 'img/logo.png' %}" alt="About Us" class="img-fluid rounded-circle">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

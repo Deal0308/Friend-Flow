@@ -1,0 +1,18 @@
+{% extends 'templates/default.php' %}
+
+{% block title %}Forbidden (403){% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="text-center">
+                    <img src="{% static 'images/403.png' %}" alt="403 Error" class="img-fluid mb-3">
+                    <h1 class="display-4">Forbidden</h1>
+                    <p class="lead">403: Access forbidden, you do not have access to this page.</p>
+                    <a href="{{ urlFor('home') }}" class="btn btn-primary">Return to Homepage</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

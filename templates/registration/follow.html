@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Follow Users{% endblock title %}
+
+{% block content %}
+  <div class="container">
+    <h1>Follow Users</h1>
+    <hr>
+    <h3>Suggested Users:</h3>
+    <ul>
+      {% for user in suggested_users %}
+        <li>{{ user.username }} - <a href="{ url 'follow_user' user.id }">Follow</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock content %}

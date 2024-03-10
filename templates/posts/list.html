@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Post List{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Post List</h1>
+    <div class="row mt-4">
+        {% for post in post_list %}
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">{{ post.title }}</h2>
+                    <p class="card-text">
+                        {% if post.body|length > 150 %}
+                        {{ post.body|truncatechars_html:150 }}
+                        <span class="collapse" id="collapse{{ post.pk }}">{{ post.body|slice:"150:" }}</span>
+                        <a class="btn btn-link" data-toggle="collapse" href="#collapse{{ post.pk }}" role="button"
+                            aria-expanded="false" aria-controls="collapse{{ post.pk }}">Read more</a>
+                        {% else %}
+                        {{ post.body }}
+                        {% endif %}
+                    </p>
+                    <p class="card-text">
+                        <strong>Author:</strong>
+                        <a href="{% url 'profile' user_id=post.author.id %}">{{ post.author }}</a>
+                        <img src="{{ post.author.profile.photo.url }}" alt="Profile Photo" class="img-fluid rounded-circle smaller-image">
+                    </p>
+
+                    <button class="follow-btn" data-user-id="{{ post.author.id }}">Follow</button>
+
+                    <p class="card-text"><strong>Last Updated:</strong> {{ post.last_updated }}</p>
+                    <div class="btn-group">
+                        {% if user.is_authenticated %}
+                        {% if post.author == user %}
+                        <a href="{% url 'edit' post.pk %}" class="btn btn-primary">Edit</a>
+                        <a href="{% url 'delete' post.pk %}" class="btn btn-danger">Delete</a>
+                        {% endif %}
+                        {% endif %}
+                        <a href="{% url 'detail' post.pk %}" class="btn btn-primary">Read more</a>
+                        <!-- Like button -->
+                        <button class="like-btn" data-post-pk="{{ post.pk }}">
+                            <i class="fas fa-thumbs-up"></i> Like
+                        </button>
+                        <span class="like-count"><i class="fas fa-heart"></i> Likes: {{ post.likes }}</span>
+
+                        <!-- Comment button -->
+                        <a href="{% url 'comment' post.pk %}" class="btn btn-primary">
+                            <i class="fas fa-comments"></i> Comment
+                        </a>
+                        <span class="comment-count"><i class="fas fa-comment-dots"></i> Comments: {{ post.comments.count }}</span>
+                        </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Event listener for follow button click
+    $('.follow-btn').click(function() {
+        console.log("Follow button clicked")
+        var button = $(this); // Store $(this) in a variable
+        var userId = button.data('user-id');
+        var action = button.text(); // Check if it's Follow or Unfollow
+        
+        $.ajax({
+            type: 'POST',
+            url: '/accounts/follow/', // URL to your follow/unfollow view
+            data: {
+                'user_id': userId,
+                'action': action.toLocaleLowerCase(), // follow , unfollow
+                'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token for security
+            },
+            success: function(response) {
+                if (response.status == 'success') {
+                    // Toggle button text and style based on action
+                    if (action == 'Follow') {
+                        button.text('Unfollow').removeClass('follow-btn').addClass('unfollow-btn');
+                    } else {
+                        button.text('Follow').removeClass('unfollow-btn').addClass('follow-btn');
+                    }
+                } else {
+                    console.log('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+
+    // Function to fetch and update like count for each post
+    function updateLikeCount() {
+        $('.like-btn').each(function () {
+            var postId = $(this).data('post-pk');
+            var likeCountElement = $(this).siblings('.like-count');
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_like_count" %}',
+                data: {
+                    'post_pk': postId
+                },
+                success: function (response) {
+                    likeCountElement.text('Likes: ' + response.like_count);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log('Error:', xhr.responseText);
+                }
+            });
+        });
+    }
+
+    // Call the updateLikeCount function when the page loads
+    updateLikeCount();
+
+    // Event handler for like button click
+    $('.like-btn').click(function () {
+        var postId = $(this).data('post-pk');
+        var button = $(this);
+        $.ajax({
+            type: 'POST',
+            url: '/posts/like_ajax/' + postId + '/',  // Use the correct URL pattern
+            data: {
+                'post_pk': postId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (response) {
+                if (response.error) {
+                    console.log(response.error);
+                } else {
+                    button.siblings('.like-count').text('Likes: ' + response.like_count);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log('Error:', xhr.responseText);
+            }
+        });
+    });
+
+});
+</script>
+
+{% endblock content %}

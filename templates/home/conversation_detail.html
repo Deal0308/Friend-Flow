@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversation Detail{% endblock %}
+
+{% block content %}
+    <div class="conversation-detail">
+        <h2>Conversation with 
+            {% for user in conversation.members.all %}
+                {% if user != request.user %}
+                    {{ user.username }}
+                {% endif %}
+            {% endfor %}
+        </h2>        <ul class="message-list">
+            {% for message in conversation.messages.all %}
+                <li class="message">
+                    <strong>{{ message.sender.username }}:</strong> <!-- Assuming sender is a user object -->
+                    <span>{{ message.content }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        
+        <!-- Updated form ID and removed unnecessary fields -->
+        <form id="replyForm">
+            {% csrf_token %}
+            <div class="message-input">
+                <textarea name="content" rows="4" cols="50" placeholder="Type your message here"></textarea>
+            </div>
+            <button type="submit" class="send-button">Send</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#replyForm").submit(function(event) {
+                event.preventDefault();
+                
+                var formData = {
+                    'content': $('textarea[name=content]').val(), // Ensure this matches the form's field
+                };
+                
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'reply_to_conversation' conversation.id %}", // Adjust URL as needed
+                    data: formData, // Update to send formData as application/x-www-form-urlencoded
+                    beforeSend: function(xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function(response) {
+                        console.log("Reply sent:", response);
+                        $('textarea[name=content]').val(''); // Clear the textarea
+                        // Optionally, append the new message to the message list
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error replying to conversation:", xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+
+
+<script>
+    $(document).ready(function() {
+        $(".deleteConversationButton").click(function() {
+            var conversationId = $(this).data("conversation-id");
+    
+            $.ajax({
+                type: "DELETE",
+                url: "/path/to/delete/conversation/" + conversationId + "/",
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    }
+                },
+                success: function(data) {
+                    console.log("Conversation deleted: ", data);
+                    // Handle success (e.g., remove the conversation from the UI)
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error deleting conversation: ", xhr.responseText);
+                    // Handle error
+                }
+            });
+        });
+    });
+    </script>
+    
+{% endblock content %}

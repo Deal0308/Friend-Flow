@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <header class="text-center py-5">
+                    <h1 class="display-4 my-heading">Welcome to Friend Flow</h1>
+                    <p class="lead my-paragraph">An uncensored way to communicate with friends</p>
+                </header>
+
+                {% if user.is_authenticated %}
+                    <div class="alert alert-success" role="alert">
+                        You are logged in as <strong>{{ user.username }}</strong>.
+                    </div>
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        You are not logged in. Would you like to <a href="{% url 'login' %}">log in</a> or <a href="{% url 'signup' %}">sign up</a>?
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

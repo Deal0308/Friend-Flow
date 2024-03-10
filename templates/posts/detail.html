@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Post Detail{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mt-4">Post Detail</h1>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">{{ post.title }}</h2>
+                <h6 class="card-subtitle mb-2 text-muted">{{ post.subtitle }}</h6>
+                <p class="card-text">{{ post.body }}</p>
+                <p class="card-text"><strong>Author:</strong> {{ post.author }}</p>
+                <p class="card-text"><strong>Posted on:</strong> {{ post.last_updated }}</p>
+                <p class="card-text"><strong>Comments:</strong> {{ post.comments.count }}</p>
+                <p class="card-text"><strong>Likes:</strong> {{ post.likes.count }}</p>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+            <div class="btn-group">
+                <a href="{% url 'edit' post.pk %}" class="btn btn-primary">Edit</a>
+                <a href="{% url 'delete' post.pk %}" class="btn btn-danger">Delete</a>
+                <button class="like-btn" data-post-pk="{{ post.pk }}">Like</button>
+
+                <a href="{% url 'comment' post.pk %}" class="btn btn-primary">Comment</a>                                   
+            </div>
+        {% endif %}
+    </div>
+    <!-- Comments Section -->
+    <div class="mt-4">
+        <h3>Comments</h3>
+        {% for comment in post.comments.all %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <p class="card-text">{{ comment.content }}</p>
+                <p class="card-text"><strong>Author:</strong> {{ comment.author }}</p>
+                <p class="card-text"><strong>Posted on:</strong> {{ comment.created_on }}</p>
+                {% if user.is_authenticated %}
+                {% if comment.author == user.username or comment.author == user %}
+                <a href="{% url 'comment_delete' pk=comment.pk %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'comment_update' pk=comment.pk %}" class="btn btn-primary">Update</a>               
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p>No comments yet.</p>
+        {% endfor %}
+    </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Function to fetch and update like count for each post
+            function updateLikeCount() {
+                $('.like-btn').each(function () {
+                    var postId = $(this).data('post-pk');
+                    var likeCountElement = $(this).siblings('.like-count');
+                    $.ajax({
+                        type: 'GET',
+                        url: '{% url "get_like_count" %}',
+                        data: {
+                            'post_pk': postId
+                        },
+                        success: function (response) {
+                            likeCountElement.text('Likes: ' + response.like_count);
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            console.log('Error:', xhr.responseText);
+                        }
+                    });
+                });
+            }
+    
+            // Call the updateLikeCount function when the page loads
+            updateLikeCount();
+    
+            // Event handler for like button click
+            $('.like-btn').click(function () {
+                var postId = $(this).data('post-pk');
+                var button = $(this);
+                $.ajax({
+                    type: 'POST',
+                    url: '/posts/like_ajax/' + postId + '/',  // Use the correct URL pattern
+                    data: {
+                        'post_pk': postId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (response) {
+                        if (response.error) {
+                            console.log(response.error);
+                        } else {
+                            button.siblings('.like-count').text('Likes: ' + response.like_count);
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log('Error:', xhr.responseText);
+                    }
+                });
+            });
+    
+        });
+    </script>
+    
+{% endblock content %}
