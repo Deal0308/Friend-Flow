@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+
 from pathlib import Path
 from environs import Env
 
@@ -49,7 +50,7 @@ LOGGING = {
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost',]
 
 
 # Application definition
@@ -103,10 +104,19 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'MDATA',
+        'USER': 'main',
+        'PASSWORD': 'karate56',
+        'HOST': 'localhost',  # Or the actual hostname if the database is not on the same server
+        'PORT': '5432',
     }
 }
+
+
+
+
+
 
 
 # Password validation
@@ -148,6 +158,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -163,9 +174,10 @@ LOGIN_REDIRECT_URL = 'list'
 
 EMAIL_BACKEND = ('django.core.mail.backends.%s.EmailBackend'% env.str('EMAIL_BACKEND',default='smtp'))
 
-EMAIL_HOST = env.str('EMAIL_HOST')
-EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
+# settings.py
+EMAIL_HOST = 'your_email_host'  # Temporarily hard-code the value
+EMAIL_HOST_USER = 'your_email_host_user'  # Temporarily hard-code the value
+EMAIL_HOST_PASSWORD = 'your_email_host_password'  # Temporarily hard-code the value
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL')
+DEFAULT_FROM_EMAIL = 'your_email_host_user'  # Temporarily hard-code the value

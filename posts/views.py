@@ -151,3 +151,6 @@ class LikeUpdateView(LoginRequiredMixin, CreateView):
         except Like.DoesNotExist:
             Like.objects.create(post=post, user=self.request.user)
         return redirect(reverse('detail', kwargs={'pk': post.pk}))
+
+
+

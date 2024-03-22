@@ -1,0 +1,11 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.dockerignore
+.git
+.gitignore
+node_modules
+staticfiles
+media
