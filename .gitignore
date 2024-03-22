@@ -2,3 +2,4 @@
 echo "node_modules" >> .gitignore
 python3 -m venv venv
 pycache
+debug.log
